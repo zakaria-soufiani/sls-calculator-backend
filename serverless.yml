@@ -1,0 +1,17 @@
+service: sls-calc-backend
+
+provider:
+  name: aws
+  runtime: python2.7
+
+functions:
+
+  get:
+    handler: logic.calculate
+    events:
+      - http:
+          path: calc
+          method: post
+          cors: true
+
+
