@@ -1,9 +1,12 @@
 import json
+import time
 
 
 
 def calculate(event, context):
     data = json.loads(event['body'])
+
+    timestamp = int(time.time() * 1000)
 
     num1 = int(data['num1'])
     num2 = int(data['num2'])
@@ -13,8 +16,10 @@ def calculate(event, context):
 
     results = {
         'addition': addition,
-        'multiplication': multiplication
+        'multiplication': multiplication,
+        'timestamp': timestamp
     }
+
     # create a response
     response = {
         "statusCode": 200,
