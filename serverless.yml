@@ -7,7 +7,7 @@ provider:
 functions:
 
   get:
-    handler: logic.calculate
+    handler: python-cost.python_cost_calculate
     events:
       - http:
           path: calc
