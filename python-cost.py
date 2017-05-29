@@ -8,6 +8,10 @@ def python_cost_calculate(event, context):
 
     timestamp = int(time.time() * 1000)
 
+    # Variable definitions:
+    # price per request, free tier limit requests, free tier compute limit,
+    # lambda cost per GBs
+
     request_price = 0.0000002
 
     free_tier_request = 1000000
@@ -16,28 +20,39 @@ def python_cost_calculate(event, context):
 
     lambda_gbs_cost = 0.00001667
 
+    # Retreive variables from HHTP request
+
     memory_allocation = int (data['memory_allocation'])
     execution_times   = int (data['execution_times'])
     execution_length  = float (data['execution_length'])
+    free_tier_check   = bool (data['free_tier_check'])
+
 
     # Total compute (seconds)
     # Total compute (GB-s)
 
-    total_request_charges = (execution_times - free_tier_request) * request_price
+    total_request_charges_free = (execution_times - free_tier_request) * request_price
+    total_request_charges_paid = execution_times * request_price
 
-    total_compute_seconds   = execution_times * execution_length
 
+    total_compute_seconds = execution_times * execution_length
     total_compute_gbs = total_compute_seconds * (memory_allocation / float(1024))
-
     monthly_billable_compute = total_compute_gbs - free_tier_compute
 
-    monthly_compute_charges = (monthly_billable_compute * lambda_gbs_cost) + total_request_charges
+    monthly_compute_charges_free = (monthly_billable_compute * lambda_gbs_cost) + total_request_charges_free
+    monthly_compute_charges_paid = (total_compute_gbs * lambda_gbs_cost) + total_request_charges_paid
 
-    monthly_compute_charges_string = "$"+str(monthly_compute_charges)
+    if (free_tier_check):
+        monthly_compute_charges_final = monthly_compute_charges_free
+    else:
+        monthly_compute_charges_final = monthly_compute_charges_paid
 
+
+    # JSON Response
     results = {
-        'monthly_cost': monthly_compute_charges_string,
-        'timestamp': timestamp
+        'monthly_cost': monthly_compute_charges_final,
+        'timestamp': timestamp,
+        'check': free_tier_check
     }
 
     # create a response
