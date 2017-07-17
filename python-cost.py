@@ -18,6 +18,7 @@ def python_cost_calculate(event, context):
 
     free_tier_compute = 400000
 
+
     lambda_gbs_cost = 0.00001667
 
     # Retreive variables from HHTP request
@@ -25,7 +26,7 @@ def python_cost_calculate(event, context):
     memory_allocation = int (data['memory_allocation'])
     execution_times   = int (data['execution_times'])
     execution_length  = float (data['execution_length'])
-    free_tier_check   = bool (data['free_tier_check'])
+    free_tier_check   = str (data['free_tier_check'])
 
 
     # Total compute (seconds)
@@ -42,7 +43,7 @@ def python_cost_calculate(event, context):
     monthly_compute_charges_free = (monthly_billable_compute * lambda_gbs_cost) + total_request_charges_free
     monthly_compute_charges_paid = (total_compute_gbs * lambda_gbs_cost) + total_request_charges_paid
 
-    if (free_tier_check):
+    if (free_tier_check == 'true'):
         monthly_compute_charges_final = monthly_compute_charges_free
     else:
         monthly_compute_charges_final = monthly_compute_charges_paid
